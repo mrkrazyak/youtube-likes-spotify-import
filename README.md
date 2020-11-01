@@ -18,3 +18,4 @@ pip install -r dependencies.txt
 ```python
 python import_songs.py
 ```
+7. You will be prompted with a Google account url to visit and grant the program access to your account. Login to your account that you want to import your YouTube likes from, copy the token shown, and paste it into the prompt. It will then start adding your liked songs to a new Spotify playlist.
