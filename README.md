@@ -1,5 +1,6 @@
 # youtube-likes-spotify-import
 Create a Spotify playlist that contains all songs in your YouTube liked videos
+## Running Locally
 1. Clone this repository.
 2. Install all dependencies by running the following command:
 ```python
@@ -19,3 +20,5 @@ pip install -r dependencies.txt
 python import_songs.py
 ```
 7. You will be prompted with a Google account url to visit and grant the program access to your account. Login to your account that you want to import your YouTube likes from, copy the token shown, and paste it into the prompt. It will then start adding your liked songs to a new Spotify playlist.
+
+Note: The program can be run multiple times to look for any new liked videos, it will add any new songs to the already created playlist if it has not been renamed.
