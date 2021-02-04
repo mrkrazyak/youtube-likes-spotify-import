@@ -147,8 +147,17 @@ class SongImport:
                 if len(items) == 2:
                     artist = items[0].strip()
                     track = items[1].strip()
+                    # Remove some parts of artist and track names to help with searching
                     if "(" in track:
                         track = track.split("(", 1)[0].strip()
+                    if "[" in track:
+                        track = track.split("[", 1)[0].strip()
+                    if " ft" in artist:
+                        artist = artist.split(" ft", 1)[0].strip()
+                    if " feat" in artist:
+                        artist = artist.split(" feat", 1)[0].strip()
+                    if " &" in artist:
+                        artist = artist.split(" &", 1)[0].strip()
                     uri = self.find_song_uri(track, artist)
                     if uri is not None:
                         self.song_info[title] = {
@@ -185,20 +194,27 @@ class SongImport:
 
     def add_tracks_to_playlist(self, playlist_id, track_uris):
         """Add the list of track uris to the playlist_id passed in"""
-        # TODO: Send multiple requests if number of tracks to add is over 100, endpoint accepts up to 100 track uris
-        query = "https://api.spotify.com/v1/playlists/{}/tracks".format(
-            playlist_id)
-        request_data = json.dumps(track_uris)
-        response = requests.post(
-            query,
-            data=request_data,
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": "Bearer {}".format(self.spotify_bearer_token)
-            }
-        )
-        response_json = response.json()
-        return response_json["snapshot_id"]
+        i = 0
+        limit = 100
+        snapshot_id = "none"
+        # Send multiple requests if number of tracks to add is over 100, endpoint accepts up to 100 track uris
+        while i < len(track_uris):
+            subset = track_uris[i:i + limit]
+            query = "https://api.spotify.com/v1/playlists/{}/tracks".format(
+                playlist_id)
+            request_data = json.dumps(subset)
+            response = requests.post(
+                query,
+                data=request_data,
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer {}".format(self.spotify_bearer_token)
+                }
+            )
+            response_json = response.json()
+            snapshot_id = response_json["snapshot_id"]
+            i += limit
+        return snapshot_id
 
     def start_import(self):
         """Main method that finds all liked songs on YouTube and adds them to a Spotify playlist"""
